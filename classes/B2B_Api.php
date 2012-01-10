@@ -140,7 +140,7 @@ class B2B_Api
 
              //делаем запрос
             return $this->process_response(
-                        $this->make_request('import/position/'.$_cat_id.'/'.$_dev_id.'/', $_params),'POST'
+                        $this->make_request('import/position/'.$_cat_id.'/'.$_dev_id.'/', $_params,'POST')
                                         );
 
         }

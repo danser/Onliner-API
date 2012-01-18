@@ -13,7 +13,7 @@ class B2B_Api
     private $access_key;                //ключ доступа к API
     private $price_fields = array(  'cat_id'        => false,
                                     'dev_id'        => false,
-                                    'client_pos_id' => false,
+                                    'pos_id'        => false,
                                     'price'         => false,
                                     'beznal'        => false,
                                     'on_stock'      => false,
@@ -23,7 +23,7 @@ class B2B_Api
                                     'credit'        => false,
                                     'delete'        => false,
                                 );
-    private $api_url = "http://api.onliner.by/b2b_new/";
+    private $api_url = "http://api.onliner.by/b2b/";
     private $curl;                      //объект curl
     private $curl_timeout = 10;         //время ожидания ответа сервера API
     private $error_msg;
@@ -123,52 +123,50 @@ class B2B_Api
             }
     }
 
-
     /**
-     * функция редактирования позиции прайслиста
+     * функция для пакетной загрузки данных
+     * принимает массив, в котором надо передавать все редактируемые позиции
      *
-     * @param <type> $_params - набор параметров для изменения
-     * @return <type>
-     */
-    public function insert_position($_cat_id = false, $_dev_id = false, $_params = array())
-    {
-        //не отправляем запрос на сервер впустую
-        if($_cat_id && $_dev_id && count($_params))
-        {
-            //фильтруем параметры, оставляя только нужные
-            $_params = array_intersect_key($_params,$this->price_fields);
-
-             //делаем запрос
-            return $this->process_response(
-                        $this->make_request('import/position/'.$_cat_id.'/'.$_dev_id.'/', $_params,'POST')
-                                        );
-
-        }
-    }
-
-
-    /**
-     * функция редактирования позиции прайслиста
+     * $_data = array(
+     *                array(
+     *                        'cat_id'        => false,
+     *                        'dev_id'        => false,
+     *                        'pos_id'        => false,
+     *                        'price'         => false,
+     *                        'beznal'        => false,
+     *                        'on_stock'      => false,
+     *                        'comment'       => false,
+     *                        'warranty'      => false,
+     *                        'shipment'      => false,
+     *                        'credit'        => false,
+     *                        'delete'        => false,
+     *                     ),
+     *                array(
+     *                      ...
+     *                     ),
+     *               );
      *
-     * @param <type> $_pos_id - уникальный номер позиции в прайсе
-     * @param <type> $_params - набор параметров для изменения
-     * @return <type>
+     * При добавлении новой позиции обязательными являются все поля, кроме 'delete'.
+     *
+     * При редактировании существующей позиции необходимо указать поля 'cat_id', 'dev_id' и 'pos_id',
+     * остальные данные указываются опционально (например, если надо обновить цену, то необходимо
+     * вместе с обязательными полями передать значение поля 'price'). При редактировании
+     * передавать поле 'delete' не надо.
+     *
+     * При удалении существующей позиции необходимо передать 'cat_id', 'dev_id', 'pos_id' и 'delete',
+     * равный 1, т.е. элемент массива $_data будет иметь вид:
+     * $_data = array(
+     *                array(
+     *                        'cat_id'        => {cat_id},
+     *                        'dev_id'        => {dev_id},
+     *                        'pos_id'        => {pos_id},
+     *                        'delete'        => 1,
+     *                     ),
+     *                array(
+     *                      ...
+     *                     ),
+     *               );
      */
-    public function edit_position($_cat_id = false, $_dev_id = false, $_pos_id = false, $_params = array())
-    {
-        //не отправляем запрос на сервер впустую
-        if($_cat_id && $_dev_id && $_pos_id && count($_params))
-        {
-            //фильтруем параметры, оставляя только нужные
-            $_params = array_intersect_key($_params,$this->price_fields);
-
-            //делаем запрос
-            return $this->process_response(
-                $this->make_request('import/position/'.$_cat_id.'/'.$_dev_id.'/'.$_pos_id, $_params,'POST')
-            );
-
-        }
-    }
 
     public function edit_position_pack($_data = array())
     {
@@ -181,10 +179,14 @@ class B2B_Api
         return $this->process_response($this->make_request('import/positionpack', array('pos_pack' => $_data),'POST'));
     }
 
+    /**
+     * функция для обновления актуальности позиций
+     *
+     */
 
     public function actual_positions($_data = array())
     {
-        return $this->process_response($this->make_request('import/isactual', array('pos_ids' => json_encode($_data)),'GET'));
+        return $this->process_response($this->make_request('import/isactual', array('pos_ids' => json_encode($_data)),'POST'));
     }
 
     /**
@@ -329,6 +331,7 @@ class B2B_Api
             return FALSE;
         }
     }
+
 
     /******************************************************************
      *      Экспортирование позиций прайса, по ответ в json

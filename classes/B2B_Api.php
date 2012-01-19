@@ -176,7 +176,7 @@ class B2B_Api
             $_data[$k] = array_intersect_key($v,$this->price_fields);
         }
         //делаем запрос
-        return $this->process_response($this->make_request('import/positionpack', array('pos_pack' => $_data),'POST'));
+        return $this->process_response($this->make_request('import/positionpack', array('pos_pack' => json_encode($_data)),'POST'));
     }
 
     /**

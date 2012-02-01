@@ -25,7 +25,7 @@ class B2B_Api
                                 );
     private $api_url = "http://api.onliner.by/b2b/";
     private $curl;                      //объект curl
-    private $curl_timeout = 10;         //время ожидания ответа сервера API
+    private $curl_timeout = 20;         //время ожидания ответа сервера API
     private $error_msg;
     private $error_code;
     private $https = FALSE;             //API работает через https

@@ -2,7 +2,7 @@ Onliner-API. Версия 2.
 =============
 
 Предназначено для интеграции с сервисами onliner.by.
-Более подробную документацию можно изучить в [wiki](http://wiki.github.com/shemerey/Onliner-API/)
+Более подробную документацию можно изучить в [wiki](https://github.com/onlinerby/Onliner-API/wiki)
 
 #Нововведения
 
